@@ -17,6 +17,8 @@
 static bool bIsRunning = true;
 static void* BitmapMemory;
 BITMAPINFO BitmapInfo = { 0 } ;
+static long ClientWidth = 0;
+static long ClientHeight = 0;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -43,7 +45,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                                WS_OVERLAPPEDWINDOW,            // Window style
                                
                                // Size and position
-                               CW_USEDEFAULT, CW_USEDEFAULT, DISPLAY_WIDTH, DISPLAY_HEIGHT,
+                               CW_USEDEFAULT, CW_USEDEFAULT, DISPLAY_WIDTH + 50, DISPLAY_HEIGHT + 50,
                                
                                NULL,       // Parent window    
                                NULL,       // Menu
@@ -76,7 +78,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     
 	memset(BitmapMemory,0,BITMAP_MEMORY_SIZE_IN_BYTES);
     // Run the message loop.
-	
+    
+    RECT ClientRect;
+    GetClientRect(hwnd,&ClientRect);
+	ClientWidth = ClientRect.right - ClientRect.left;
+    ClientHeight = ClientRect.bottom - ClientRect.top;
 	while(bIsRunning){
 		MSG Message = { 0 };
 		while(PeekMessage(&Message,hwnd,0,0,PM_REMOVE)){
@@ -88,7 +94,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		}
 	}
 	
-	VirtualFree(
+    VirtualFree(
                 BitmapMemory,
                 0, //If the dwFreeType parameter is MEM_RELEASE, this parameter must be 0 (zero).
                 MEM_RELEASE);
@@ -102,8 +108,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 		case WM_KEYDOWN:{
             //Key Code 'A'
 			if(wParam == 0x41){
-				memset(BitmapMemory,0,BITMAP_MEMORY_SIZE_IN_BYTES);
-                const int Iteration = 2;
+				memset(BitmapMemory,126,BITMAP_MEMORY_SIZE_IN_BYTES);
+                const int Iteration = 3;
 				GenerateBSPRooms(BitmapMemory,
                                  DISPLAY_WIDTH,
                                  DISPLAY_HEIGHT,
@@ -122,13 +128,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 		case WM_PAINT:{
 			PAINTSTRUCT ps;
 			HDC DeviceContext = BeginPaint(hwnd, &ps);
-            
+            HBRUSH hBrush = CreateSolidBrush(RGB(0,200,0));
+            RECT rect;
+            FillRect(DeviceContext, &rect, hBrush);
 			// All painting occurs here, between BeginPaint and EndPaint.
             
 			StretchDIBits(
                           DeviceContext,
-                          0,//xDest,
-                          0,//yDest,
+                          15,//xDest,
+                          5,//yDest,
                           DISPLAY_WIDTH,//DestWidth,
                           DISPLAY_HEIGHT,//DestHeight,
                           0,//xSrc,
