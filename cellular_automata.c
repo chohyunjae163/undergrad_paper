@@ -14,12 +14,12 @@
 #include <stdint.h> //uint32_t
 #include <stdlib.h> //srand()
 
-const int BIRTH_THRESHOLD = 3;
-const int SURVIVAL_THRESHOLD = 5;
+const uint32_t BIRTH_THRESHOLD = 3;
+const uint32_t SURVIVAL_THRESHOLD = 4;
+const uint32_t SIMULATION_COUNT = 4;
 
-
-void cellular_automata(void* display_buffer,uint32_t w,uint32_t h) {
-    if(display_buffer == NULL) {
+void cellular_automata(void* organism,uint32_t w,uint32_t h) {
+    if(organism == NULL) {
         return;
     }
     
@@ -27,51 +27,58 @@ void cellular_automata(void* display_buffer,uint32_t w,uint32_t h) {
     QueryPerformanceCounter(&ticks);
     srand(ticks.QuadPart);
     
-    uint32_t alive = 255;
-    for(int i = 0; i < 2;++i) {
-        open = open << 8 | 255;
+    //set alive and dead code
+    const uint32_t alive = 0;
+    uint32_t dead = 255;
+    {
+        for(int i = 0; i < 2;++i) {
+            dead = dead << 8 | 255;
+        }
     }
     
-    const uint32_t dead = 0;
     //make a chaos, generate alive and dead cells randomly.
-    uint32_t* ptr_buffer = (uint32_t *)display_buffer;
+    uint32_t* cells = (uint32_t *)organism;
     uint32_t count = 0;
     while(count < (w * h)) {
-        ptr_buffer[count] = rand() % 2 == 1 ? alive : dead;
+        cells[count] = rand() % 2 == 1 ? alive : dead;
         count++;
     }
     
     //let's get into the algorithm! For each cell,
-    //1. calculate n of alive neighbors
-    const int ROW = h;
-    const int COLUMN = w;
-    for(uint32_t r = 0; r < ROW; ++r) {
-        for(uint32_t c = 0; c < COLUMN;++c) {
-            // checking neighbors
-            int alive_count = 0;
-            for(uint32_t i = -1; i <= 1; ++i) {
-                for(uint32_t j = -1; j <= 1;++j) {
-                    uint32_t neighbor_x = r + i;
-                    uint32_t neighbor_y = c + j;
-                    if( i == 0 && j == 0) {
-                        //self case do nothing
-                    } else if (x < 0 || 
-                               y < 0 || 
-                               neighbor_x >= ROW
-                               neighbor_y >= COLUMN) {
-                        alive_count += 2; //make boundaries alive
-                    } else if(ptr_buffer[neighbor_x][neighbor_y] == alive) {
-                        alive_count += 1;
+    //calculate n of alive neighbors
+    const int ROW_NUM = h;
+    const int COLUMN_NUM = w;
+    for(uint32_t t = 0; t < SIMULATION_COUNT; ++t) {
+        for(uint32_t r = 0; r < ROW_NUM; ++r) {
+            for(uint32_t c = 0; c < COLUMN_NUM;++c) {
+                // count alive number of neighbors
+                uint32_t  alive_count = 0;
+                for(int32_t i = -1; i <= 1; ++i) {
+                    for(int32_t j = -1; j <= 1;++j) {
+                        int32_t neighbor_x = c + j;
+                        int32_t neighbor_y = r + i;
+                        if( i == 0 && j == 0) {
+                            //self case do nothing
+                        } else if (neighbor_x < 0 || 
+                                   neighbor_y < 0 || 
+                                   neighbor_x >= COLUMN_NUM ||
+                                   neighbor_y >= ROW_NUM) {
+                            alive_count += 2; //make boundaries alive
+                        } else if(cells[neighbor_x + COLUMN_NUM * neighbor_y] == alive) {
+                            alive_count += 1;
+                        }
                     }
                 }
+                const uint32_t current_index = c +  COLUMN_NUM * r;
+                if(cells[current_index] == dead && alive_count > BIRTH_THRESHOLD) {
+                    cells[current_index] = alive;
+                } else if(cells[current_index] == alive && alive_count > SURVIVAL_THRESHOLD) {
+                    cells[current_index] = alive;
+                } else {
+                    cells[current_index] = dead;
+                }
             }
-            if(ptr_buffer[r][c] == dead && count > BIRTH_THRESHOLD){
-                ptr_buffer[r][c] = alive;
-            }else if(ptr_buffer[r][c] == alive && count > SURVIVAL_THRESHOLD){
-                ptr_buffer[r][c] = alive;
-            }else {
-                ptr_buffer[r][c] = dead;
-            }
-        }
+            
+        };
     } 
 }
