@@ -10,8 +10,8 @@
 #include <stdint.h> //uint32_t
 #include <assert.h> //assert()
 
-const uint8_t MIN_WIDTH = 25;
-const uint8_t MIN_HEIGHT = 25;
+const uint8_t MIN_WIDTH = 50;
+const uint8_t MIN_HEIGHT = 50;
 const uint8_t MAX_WIDTH = 50;
 const uint8_t MAX_HEIGHT = 50;
 
@@ -40,34 +40,34 @@ BinarySpacePartition(void *Parent,
 		return;
 	}
 	
-	if(ParentWidth < MAX_WIDTH + MARGIN  ||
-       ParentHeight < MAX_HEIGHT + MARGIN ||
+	if(ParentWidth <= MAX_WIDTH + MARGIN  ||
+       ParentHeight <= MAX_HEIGHT + MARGIN ||
        Iteration < 0) {
 		return;
 	}
 	
 	if(Iteration == 0) {
-        	const uint32_t Width = rand() % (ParentWidth - MARGIN);
+        const uint32_t Width = rand() % (ParentWidth - MARGIN);
 		const uint32_t RoomWidth  =  MIN_MAX(Width,MIN_WIDTH,MAX_WIDTH);
-		assert(MIN_WIDTH <= RoomWidth <= MAX_WIDTH);
+		assert(MIN_WIDTH <= RoomWidth && RoomWidth <= MAX_WIDTH);
         
-       		const uint32_t Height = rand() % (ParentHeight - MARGIN);
+        const uint32_t Height = rand() % (ParentHeight - MARGIN);
 		const uint32_t RoomHeight =  MIN_MAX(Height,MIN_HEIGHT,MAX_HEIGHT);
-		assert(MIN_HEIGHT <= RoomHeight <= MAX_HEIGHT);
+		assert(MIN_HEIGHT <= RoomHeight && RoomHeight <= MAX_HEIGHT);
         
-        	const uint32_t MaxX = ParentWidth - RoomWidth - MARGIN;
-        	assert(MaxX > 0);
-        	const uint32_t RandX = rand() % MaxX;
-		const uint32_t RoomPositionX = PADDING + RandX;
+        const int32_t MaxPosX = ParentWidth - RoomWidth - MARGIN;
+        assert(MaxPosX > 0);
+        const int32_t RandPosX = rand() % MaxPosX;
+		const int32_t RoomPosX = PADDING + RandPosX;
         
-        	const uint32_t MaxY = ParentHeight - RoomHeight - MARGIN;
-        	assert(MaxY > 0);
-        	const uint32_t RandY = rand() % MaxY;
-		const uint32_t RoomPositionY = PADDING + RandY; 
+        const int32_t MaxPosY = ParentHeight - RoomHeight - MARGIN;
+        assert(MaxPosY > 0);
+        const int32_t RandPosY = rand() % MaxPosY;
+		const int32_t RoomPosY = PADDING + RandPosY; 
         
-        	//4 bytes per pixel
+        //4 bytes per pixel
 		uint32_t *Bitmap = (uint32_t *) Parent;
-		uint32_t *Begin = Bitmap + RoomPositionX + (RoomPositionY * DisplayWidth);
+		uint32_t *Begin = Bitmap + RoomPosX + (RoomPosY * DisplayWidth);
 		
 		for(int row = 0; row < RoomHeight;++row) {
 			uint8_t *Pixel = (uint8_t *)(Begin + (DisplayWidth * row));
@@ -82,7 +82,8 @@ BinarySpacePartition(void *Parent,
 				++Pixel;				
 			}
 		}
-        	return;
+        
+        return;
 	}
     
     //partition - divide a room into two rooms
