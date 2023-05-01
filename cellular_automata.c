@@ -13,10 +13,10 @@
 
 #include <stdint.h> //uint32_t
 #include <stdlib.h> //srand()
-
-const uint32_t BIRTH_THRESHOLD = 3;
-const uint32_t SURVIVAL_THRESHOLD = 4;
-const uint32_t SIMULATION_COUNT = 4;
+#include <windows.h> 
+static const int32_t BIRTH_THRESHOLD = 3;
+static const int32_t SURVIVAL_THRESHOLD = 4;
+static const int32_t SIMULATION_COUNT = 4;
 
 void cellular_automata(void* organism,uint32_t w,uint32_t h) {
     if(organism == NULL) {
@@ -25,7 +25,7 @@ void cellular_automata(void* organism,uint32_t w,uint32_t h) {
     
     LARGE_INTEGER ticks;
     QueryPerformanceCounter(&ticks);
-    srand(ticks.QuadPart);
+    srand((unsigned int)ticks.QuadPart);
     
     //set alive and dead code
     const uint32_t alive = 0;
@@ -46,13 +46,13 @@ void cellular_automata(void* organism,uint32_t w,uint32_t h) {
     
     //let's get into the algorithm! For each cell,
     //calculate n of alive neighbors
-    const int ROW_NUM = h;
-    const int COLUMN_NUM = w;
-    for(uint32_t t = 0; t < SIMULATION_COUNT; ++t) {
-        for(uint32_t r = 0; r < ROW_NUM; ++r) {
-            for(uint32_t c = 0; c < COLUMN_NUM;++c) {
+    const int32_t ROW_NUM = h;
+    const int32_t COLUMN_NUM = w;
+    for(int32_t t = 0; t < SIMULATION_COUNT; ++t) {
+        for(int32_t r = 0; r < ROW_NUM; ++r) {
+            for(int32_t c = 0; c < COLUMN_NUM;++c) {
                 // count alive number of neighbors
-                uint32_t  alive_count = 0;
+                int32_t  alive_count = 0;
                 for(int32_t i = -1; i <= 1; ++i) {
                     for(int32_t j = -1; j <= 1;++j) {
                         int32_t neighbor_x = c + j;
