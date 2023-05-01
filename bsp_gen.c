@@ -36,56 +36,55 @@ BinarySpacePartition(void *Parent,
     QueryPerformanceCounter(&ticks);
     srand(ticks.QuadPart);
     
-	if(Parent == NULL) {
-		return;
-	}
-	
-	if(ParentWidth <= MAX_WIDTH + MARGIN  ||
-       ParentHeight <= MAX_HEIGHT + MARGIN ||
-       Iteration < 0) {
-		return;
-	}
-	
-	if(Iteration == 0) {
+    if(Parent == NULL) {
+        return;
+    }
+
+    if(ParentWidth <= MAX_WIDTH + MARGIN  ||
+        ParentHeight <= MAX_HEIGHT + MARGIN ||
+        Iteration < 0) {
+        return;
+    }
+
+    if(Iteration == 0) {
         const uint32_t Width = rand() % (ParentWidth - MARGIN);
-		const uint32_t RoomWidth  =  MIN_MAX(Width,MIN_WIDTH,MAX_WIDTH);
-		assert(MIN_WIDTH <= RoomWidth && RoomWidth <= MAX_WIDTH);
-        
+        const uint32_t RoomWidth  =  MIN_MAX(Width,MIN_WIDTH,MAX_WIDTH);
+        assert(MIN_WIDTH <= RoomWidth && RoomWidth <= MAX_WIDTH);
+
         const uint32_t Height = rand() % (ParentHeight - MARGIN);
-		const uint32_t RoomHeight =  MIN_MAX(Height,MIN_HEIGHT,MAX_HEIGHT);
-		assert(MIN_HEIGHT <= RoomHeight && RoomHeight <= MAX_HEIGHT);
-        
+        const uint32_t RoomHeight =  MIN_MAX(Height,MIN_HEIGHT,MAX_HEIGHT);
+        assert(MIN_HEIGHT <= RoomHeight && RoomHeight <= MAX_HEIGHT);
+
         const int32_t MaxPosX = ParentWidth - RoomWidth - MARGIN;
         assert(MaxPosX > 0);
         const int32_t RandPosX = rand() % MaxPosX;
-		const int32_t RoomPosX = PADDING + RandPosX;
-        
+        const int32_t RoomPosX = PADDING + RandPosX;
+
         const int32_t MaxPosY = ParentHeight - RoomHeight - MARGIN;
         assert(MaxPosY > 0);
         const int32_t RandPosY = rand() % MaxPosY;
-		const int32_t RoomPosY = PADDING + RandPosY; 
-        
+        const int32_t RoomPosY = PADDING + RandPosY; 
+
         //4 bytes per pixel
-		uint32_t *Bitmap = (uint32_t *) Parent;
-		uint32_t *Begin = Bitmap + RoomPosX + (RoomPosY * DisplayWidth);
-		
-		for(int row = 0; row < RoomHeight;++row) {
-			uint8_t *Pixel = (uint8_t *)(Begin + (DisplayWidth * row));
-			for(int column = 0; column < RoomWidth; ++column) {
-				*Pixel = 255;
-				++Pixel;
-				*Pixel = 0;
-				++Pixel;
-				*Pixel = 0;
-				++Pixel;
-				*Pixel = 0;
-				++Pixel;				
-			}
-		}
-        
+        uint32_t *Bitmap = (uint32_t *) Parent;
+        uint32_t *Begin = Bitmap + RoomPosX + (RoomPosY * DisplayWidth);
+
+        for(int row = 0; row < RoomHeight;++row) {
+            uint8_t *Pixel = (uint8_t *)(Begin + (DisplayWidth * row));
+            for(int column = 0; column < RoomWidth; ++column) {
+                *Pixel = 255;
+                ++Pixel;
+                *Pixel = 0;
+                ++Pixel;
+                *Pixel = 0;
+                ++Pixel;
+                *Pixel = 0;
+                ++Pixel;
+            }
+        }
         return;
-	}
-    
+    }
+
     //partition - divide a room into two rooms
     {
         bool bSplitVertical = rand() % 2;
@@ -102,7 +101,7 @@ BinarySpacePartition(void *Parent,
                                  HalfWidth, 
                                  ParentHeight,
                                  Iteration - 1);
-        }else {
+        } else {
             const uint32_t HalfHeight = ParentHeight / 2;
             //top
             BinarySpacePartition(Begin,
