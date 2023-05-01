@@ -4,7 +4,9 @@
 
 #include <windows.h>
 #include <stdbool.h>
-#include "bsp_gen.c"
+#include <stdint.h>
+//#include "bsp_gen.c"
+//#include "cellular_automata.c"
 
 #define DISPLAY_WIDTH 800
 #define DISPLAY_HEIGHT 600
@@ -21,6 +23,12 @@ static long ClientWidth = 0;
 static long ClientHeight = 0;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+extern void cellular_automata(void* organism,uint32_t w,uint32_t h);
+extern void
+GenerateBSPRooms(void* Parent,
+                 const uint32_t InDisplayWidth,
+                 const uint32_t InDisplayHeight);
+
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
     
@@ -102,6 +110,24 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     return 0;
 }
 
+void RedrawClient(HDC DeviceContext ){
+    StretchDIBits(
+                  DeviceContext,
+                  15,//xDest,
+                  5,//yDest,
+                  DISPLAY_WIDTH,//DestWidth,
+                  DISPLAY_HEIGHT,//DestHeight,
+                  0,//xSrc,
+                  0,//ySrc,
+                  DISPLAY_WIDTH,//SrcWidth,
+                  DISPLAY_HEIGHT,//SrcHeight,
+                  BitmapMemory,//const VOID       *lpBits,
+                  &BitmapInfo,//const BITMAPINFO *lpbmi,
+                  DIB_RGB_COLORS,
+                  SRCCOPY //raster operation code
+                  );
+};
+
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     
     switch (uMsg){
@@ -109,13 +135,23 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
             //Key Code 'A'
 			if(wParam == 0x41){
 				memset(BitmapMemory,126,BITMAP_MEMORY_SIZE_IN_BYTES);
-                const int Iteration = 3;
 				GenerateBSPRooms(BitmapMemory,
                                  DISPLAY_WIDTH,
-                                 DISPLAY_HEIGHT,
-                                 Iteration);
+                                 DISPLAY_HEIGHT);
 				InvalidateRect(hwnd,NULL,TRUE);
 			}
+            //Key Code 'B'
+            else if(wParam == 0x42){
+                memset(BitmapMemory,126,BITMAP_MEMORY_SIZE_IN_BYTES);
+                cellular_automata(BitmapMemory,
+                                  DISPLAY_WIDTH,
+                                  DISPLAY_HEIGHT);
+                InvalidateRect(hwnd,NULL,TRUE);
+            }
+            else if( wParam == 0x43){ //KEY CODE 'C'
+                memset(BitmapMemory,126,BITMAP_MEMORY_SIZE_IN_BYTES);
+                InvalidateRect( hwnd,NULL,TRUE);
+            }
 		} break;
 		case WM_CLOSE:{
 			bIsRunning = false;
@@ -124,32 +160,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 		case WM_DESTROY:{
 			bIsRunning = false;
 		} break;
-        
+        case WM_SIZE: {
+            HDC DeviceContext = GetDC(hwnd);
+            RedrawClient(DeviceContext);
+        }break;
 		case WM_PAINT:{
 			PAINTSTRUCT ps;
 			HDC DeviceContext = BeginPaint(hwnd, &ps);
             HBRUSH hBrush = CreateSolidBrush(RGB(0,200,0));
             RECT rect;
+            GetClientRect(hwnd, &rect);
             FillRect(DeviceContext, &rect, hBrush);
 			// All painting occurs here, between BeginPaint and EndPaint.
-            
-			StretchDIBits(
-                          DeviceContext,
-                          15,//xDest,
-                          5,//yDest,
-                          DISPLAY_WIDTH,//DestWidth,
-                          DISPLAY_HEIGHT,//DestHeight,
-                          0,//xSrc,
-                          0,//ySrc,
-                          DISPLAY_WIDTH,//SrcWidth,
-                          DISPLAY_HEIGHT,//SrcHeight,
-                          BitmapMemory,//const VOID       *lpBits,
-                          &BitmapInfo,//const BITMAPINFO *lpbmi,
-                          DIB_RGB_COLORS,
-                          SRCCOPY //raster operation code
-                          );
-			
-			
+            RedrawClient(DeviceContext);
 			EndPaint(hwnd, &ps);
 		} break;
         
