@@ -11,6 +11,7 @@
 //5. Simulate. repeat 1 - 5, n times
 */
 
+#include <stdio.h>
 #include <stdint.h> //uint32_t
 #include <stdlib.h> //srand()
 #include <windows.h> 
@@ -40,7 +41,8 @@ void cellular_automata(void* organism,uint32_t w,uint32_t h) {
     uint32_t* cells = (uint32_t *)organism;
     uint32_t count = 0;
     while(count < (w * h)) {
-        cells[count] = rand() % 2 == 1 ? alive : dead;
+		      const int r = rand() % 100000;
+        cells[count] = r % 2 == 0 ? alive : dead;
         count++;
     }
     
