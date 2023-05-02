@@ -11,7 +11,6 @@
 //5. Simulate. repeat 1 - 5, n times
 */
 
-#include <stdio.h>
 #include <stdint.h> //uint32_t
 #include <stdlib.h> //srand()
 #include <windows.h> 
