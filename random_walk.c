@@ -1,4 +1,4 @@
-癤?/http://www.roguebasin.com/index.php/Random_Walk_Cave_Generation
+//http://www.roguebasin.com/index.php/Random_Walk_Cave_Generation
 /*
 // initialize all map cells to walls.
 // pick a map cell as the starting point.
@@ -10,21 +10,17 @@
 */
 #include <stdint.h> //int32_t
 
-
 void random_walk(void* cave, int32_t w, int32_t h){
     if(cave == NULL) {
         return;
     }
-    
-    
-    
+
     if( w < 1 || h < 1) {
         return;
     }
     
     const uint32_t floor_num = (w * h) / 5;
     
-     
     //wall - black
     //floor - white
     // all map cells to walls.
@@ -33,11 +29,14 @@ void random_walk(void* cave, int32_t w, int32_t h){
     for(int i = 0; i < w * h; ++i) {
         map_cells[i] = wall;
     }
-    
+    uint32_t floor = 255;
+    for(uint32_t i = 0; i < 2;++i) {
+        floor = floor << 8 | 255;
+    }
     //the center as the starting point
-    uint32 starting_index = (( w * h ) / 2);
+    uint32_t starting_index = (( w * h ) / 2);
     //turn the cell into floor
-    map_cells[starting_point] = floor;
+    map_cells[starting_index] = floor;
     uint32_t floor_count = 1;
     while(floor_count < floor_num) {
         //take a random direction
@@ -48,9 +47,4 @@ void random_walk(void* cave, int32_t w, int32_t h){
         
         ++floor_count;
     }
-    
-    
-    
-    
-    
 }
