@@ -24,6 +24,7 @@ static long ClientHeight = 0;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 extern void cellular_automata(void* organism,uint32_t w,uint32_t h);
+extern void random_walk(void* cave, uint32_t w, uint32_t h);
 extern void
 GenerateBSPRooms(void* Parent,
                  const uint32_t InDisplayWidth,
@@ -150,6 +151,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
             }
             else if( wParam == 0x43){ //KEY CODE 'C'
                 memset(BitmapMemory,126,BITMAP_MEMORY_SIZE_IN_BYTES);
+                random_walk(BitmapMemory,DISPLAY_WIDTH,DISPLAY_HEIGHT);
                 InvalidateRect( hwnd,NULL,TRUE);
             }
 		} break;
