@@ -35,17 +35,17 @@ void random_walk(void* cave, int32_t w, int32_t h){
     const uint32_t floor_num = (w * h) / 10;
     //wall - black
     //floor - white
-    // all map cells to walls.
+    uint32_t floor = 255;
+    for(uint32_t i = 0; i < 2;++i) {
+        floor = floor << 8 | 255;
+    }
     const uint32_t wall = 0;
+    // all map cells to walls.
     uint32_t* map_cells = cave;
     for(int i = 0; i < w * h; ++i) {
         map_cells[i] = wall;
     }
 
-    uint32_t floor = 255;
-    for(uint32_t i = 0; i < 2;++i) {
-        floor = floor << 8 | 255;
-    }
     //the center as the starting point
     uint32_t starting_index = ((( w * h ) + w) / 2);
     //turn the cell into floor
