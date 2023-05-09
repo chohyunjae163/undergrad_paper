@@ -25,7 +25,7 @@ static long ClientHeight = 0;
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 extern void cellular_automata(void* organism,uint32_t w,uint32_t h);
 extern void random_walk(void* cave, uint32_t w, uint32_t h);
-extern void
+extern void simple_room_placement(void*,int32_t,int32_t);
 GenerateBSPRooms(void* Parent,
                  const uint32_t InDisplayWidth,
                  const uint32_t InDisplayHeight);
@@ -35,7 +35,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     
     // Register the window class.
     const wchar_t CLASS_NAME[]    = L"MyProgram";
-	const wchar_t CLASS_TEXT[]	= L"RDE";
+    const wchar_t CLASS_TEXT[]  = L"RDE";
     
     WNDCLASS wc = { 0 };
     
@@ -50,7 +50,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     HWND hwnd = CreateWindowEx(
                                0,                              // Optional window styles.
                                CLASS_NAME,                     // Window class
-                               CLASS_TEXT,    					// Window text
+                               CLASS_TEXT,                      // Window text
                                WS_OVERLAPPEDWINDOW,            // Window style
                                
                                // Size and position
@@ -68,41 +68,41 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     
     ShowWindow(hwnd, nCmdShow);
     
-	//initial setup
-	
-	BITMAPINFOHEADER BitmapInfoHeader = { 0 };
-	BitmapInfoHeader.biSize = sizeof(BitmapInfoHeader);
-	BitmapInfoHeader.biWidth = DISPLAY_WIDTH;
-	BitmapInfoHeader.biHeight = -DISPLAY_HEIGHT;
-	BitmapInfoHeader.biPlanes = 1; // Specifies the number of planes for the target device. This value must be set to 1.
-	BitmapInfoHeader.biBitCount = BITS_PER_PIXEL; //Specifies the number of bits per pixel (bpp). 
-	BitmapInfoHeader.biCompression = BI_RGB;
-	BitmapInfo.bmiHeader = BitmapInfoHeader;
-	
-	BitmapMemory  = VirtualAlloc(
+    //initial setup
+
+    BITMAPINFOHEADER BitmapInfoHeader = { 0 };
+    BitmapInfoHeader.biSize = sizeof(BitmapInfoHeader);
+    BitmapInfoHeader.biWidth = DISPLAY_WIDTH;
+    BitmapInfoHeader.biHeight = -DISPLAY_HEIGHT;
+    BitmapInfoHeader.biPlanes = 1; // Specifies the number of planes for the target device. This value must be set to 1.
+    BitmapInfoHeader.biBitCount = BITS_PER_PIXEL; //Specifies the number of bits per pixel (bpp).
+    BitmapInfoHeader.biCompression = BI_RGB;
+    BitmapInfo.bmiHeader = BitmapInfoHeader;
+
+    BitmapMemory  = VirtualAlloc(
                                  NULL, // If this parameter is NULL, the system determines where to allocate the region.
                                  BITMAP_MEMORY_SIZE_IN_BYTES,//The size of the region, in bytes. 
                                  MEM_RESERVE | MEM_COMMIT,// DWORD  flAllocationType,
                                  PAGE_READWRITE);// DWORD  flProtect
     
-	memset(BitmapMemory,0,BITMAP_MEMORY_SIZE_IN_BYTES);
+    memset(BitmapMemory,0,BITMAP_MEMORY_SIZE_IN_BYTES);
     // Run the message loop.
     
     RECT ClientRect;
     GetClientRect(hwnd,&ClientRect);
-	ClientWidth = ClientRect.right - ClientRect.left;
+    ClientWidth = ClientRect.right - ClientRect.left;
     ClientHeight = ClientRect.bottom - ClientRect.top;
-	while(bIsRunning){
-		MSG Message = { 0 };
-		while(PeekMessage(&Message,hwnd,0,0,PM_REMOVE)){
-			if(Message.message == WM_QUIT){
-				bIsRunning = false;
-			}
-	        TranslateMessage(&Message);
-			DispatchMessage(&Message);			
-		}
-	}
-	
+    while(bIsRunning){
+        MSG Message = { 0 };
+        while(PeekMessage(&Message,hwnd,0,0,PM_REMOVE)){
+            if(Message.message == WM_QUIT){
+                bIsRunning = false;
+            }
+            TranslateMessage(&Message);
+            DispatchMessage(&Message);
+        }
+    }
+
     VirtualFree(
                 BitmapMemory,
                 0, //If the dwFreeType parameter is MEM_RELEASE, this parameter must be 0 (zero).
@@ -132,15 +132,15 @@ void RedrawClient(HDC DeviceContext ){
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     
     switch (uMsg){
-		case WM_KEYDOWN:{
+        case WM_KEYDOWN:{
             //Key Code 'A'
-			if(wParam == 0x41){
-				memset(BitmapMemory,126,BITMAP_MEMORY_SIZE_IN_BYTES);
-				GenerateBSPRooms(BitmapMemory,
+            if(wParam == 0x41){
+                memset(BitmapMemory,126,BITMAP_MEMORY_SIZE_IN_BYTES);
+                GenerateBSPRooms(BitmapMemory,
                                  DISPLAY_WIDTH,
                                  DISPLAY_HEIGHT);
-				InvalidateRect(hwnd,NULL,TRUE);
-			}
+                InvalidateRect(hwnd,NULL,TRUE);
+            }
             //Key Code 'B'
             else if(wParam == 0x42){
                 memset(BitmapMemory,126,BITMAP_MEMORY_SIZE_IN_BYTES);
@@ -154,31 +154,36 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
                 random_walk(BitmapMemory,DISPLAY_WIDTH,DISPLAY_HEIGHT);
                 InvalidateRect( hwnd,NULL,TRUE);
             }
-		} break;
-		case WM_CLOSE:{
-			bIsRunning = false;
-		} break;
-		
-		case WM_DESTROY:{
-			bIsRunning = false;
-		} break;
+            else if( wParam == 0x44){ //KEY CODE 'D'
+                memset(BitmapMemory,126,BITMAP_MEMORY_SIZE_IN_BYTES);
+                simple_room_placement(BitmapMemory,DISPLAY_WIDTH,DISPLAY_HEIGHT);
+                InvalidateRect( hwnd,NULL,TRUE);
+            }
+        } break;
+        case WM_CLOSE:{
+            bIsRunning = false;
+        } break;
+
+        case WM_DESTROY:{
+            bIsRunning = false;
+        } break;
         case WM_SIZE: {
             HDC DeviceContext = GetDC(hwnd);
             RedrawClient(DeviceContext);
         }break;
-		case WM_PAINT:{
-			PAINTSTRUCT ps;
-			HDC DeviceContext = BeginPaint(hwnd, &ps);
+        case WM_PAINT:{
+            PAINTSTRUCT ps;
+            HDC DeviceContext = BeginPaint(hwnd, &ps);
             HBRUSH hBrush = CreateSolidBrush(RGB(0,200,0));
             RECT rect;
             GetClientRect(hwnd, &rect);
             FillRect(DeviceContext, &rect, hBrush);
-			// All painting occurs here, between BeginPaint and EndPaint.
+            // All painting occurs here, between BeginPaint and EndPaint.
             RedrawClient(DeviceContext);
-			EndPaint(hwnd, &ps);
-		} break;
+            EndPaint(hwnd, &ps);
+        } break;
         
     }
-	
+
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
