@@ -18,7 +18,7 @@ void simple_room_placement(void* area, int32_t w, int32_t h){
   LARGE_INTEGER ticks;
   QueryPerformanceCounter(&ticks);
   srand((unsigned int) ticks.QuadPart);
-  const int32_t room_num = 6;
+  const int32_t room_num = 12;
   int32_t current_room = 0;
 
   uint32_t floor = 255;
@@ -48,6 +48,9 @@ setup_room:
     int32_t current_index = start_pos;
     for(int32_t r = 0; r < room_height; ++r){
       current_index += w;
+      if(current_index > w * h){
+        goto setup_room;
+      }
       for(int32_t c = 0; c < room_width;++c){
         if(map[current_index + c] == floor){
          //overlap case. let's go back and setup a room again.

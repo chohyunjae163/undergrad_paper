@@ -71,11 +71,11 @@ BinarySpacePartition(void *Parent,
         for(uint32_t row = 0; row < RoomHeight;++row) {
             uint8_t *Pixel = (uint8_t *)(Begin + (DisplayWidth * row));
             for(uint32_t column = 0; column < RoomWidth; ++column) {
-                *Pixel = Color_r;
+                *Pixel = 255;
                 ++Pixel;
-                *Pixel = Color_g;
+                *Pixel = 255;
                 ++Pixel;
-                *Pixel = Color_b;
+                *Pixel = 255;
                 ++Pixel;
                 *Pixel = 0;
                 ++Pixel;
@@ -86,7 +86,7 @@ BinarySpacePartition(void *Parent,
     //partition - divide a room into two rooms
     {
         const int r = rand() % 100000;
-        bool bSplitVertical = true;//r % 2 == 0 ? true : false;
+        bool bSplitVertical = r % 2 == 0 ? true : false;
         uint32_t *Begin = Parent;
         if(bSplitVertical){
             const uint32_t HalfWidth = ParentWidth / 2;
@@ -102,11 +102,11 @@ BinarySpacePartition(void *Parent,
                 for(uint32_t r = 0; r < CorridorHeight; ++r){
                     uint8_t * Pixel = (uint8_t *) (CorridorBegin + (DisplayWidth * r));
                     for(uint32_t c = 0; c < CorridorWidth;++c){
-                        *Pixel = 200;
+                        *Pixel = 255;
                         ++Pixel;
-                        *Pixel = 200;
+                        *Pixel = 255;
                         ++Pixel;
-                        *Pixel = 200;
+                        *Pixel = 255;
                         ++Pixel;
                         *Pixel = 0;
                         ++Pixel;
@@ -124,11 +124,11 @@ BinarySpacePartition(void *Parent,
                     for(uint32_t r = 0; r < CorridorHeight; ++r){
                         uint8_t * Pixel =(uint8_t*) (RightCorridorBegin + (DisplayWidth * r));
                         for(uint32_t c = 0; c < RightCorridorWidth;++c){
-                            *Pixel = 200;
+                            *Pixel = 255;
                             ++Pixel;
-                            *Pixel = 200;
+                            *Pixel = 255;
                             ++Pixel;
-                            *Pixel = 200;
+                            *Pixel = 255;
                             ++Pixel;
                             *Pixel = 0;
                             ++Pixel;
@@ -145,11 +145,11 @@ BinarySpacePartition(void *Parent,
                     for(uint32_t r = 0; r < VerticalCorridorHeight; ++r){
                         uint8_t * Pixel =(uint8_t*) (VerticalCorridorBegin + (DisplayWidth * r));
                         for(uint32_t c = 0; c < CorridorHeight;++c){
-                            *Pixel = 200;
+                            *Pixel = 255;
                             ++Pixel;
-                            *Pixel = 200;
+                            *Pixel = 255;
                             ++Pixel;
-                            *Pixel = 200;
+                            *Pixel = 255;
                             ++Pixel;
                             *Pixel = 0;
                             ++Pixel;
@@ -170,7 +170,7 @@ BinarySpacePartition(void *Parent,
         }
 
     }
-    return ((struct tag_position){-1,-1});
+    return ((struct tag_position){ParentWidth/2,ParentHeight/2});
 }
 
 void

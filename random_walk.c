@@ -32,7 +32,7 @@ void random_walk(void* cave, int32_t w, int32_t h){
     QueryPerformanceCounter(&ticks);
     srand((unsigned int) ticks.QuadPart);
 
-    const uint32_t floor_num = (w * h) / 10;
+    const uint32_t floor_num = (w * h) / 4;
     //wall - black
     //floor - white
     uint32_t floor = 255;
@@ -54,8 +54,13 @@ void random_walk(void* cave, int32_t w, int32_t h){
     uint32_t current_index = starting_index;
     while(floor_count < floor_num) {
         //take a random direction
+        uint32_t wander_try = 0;
         while(current_index == -1 ||
               map_cells[current_index] == floor){
+            ++wander_try;
+            if(wander_try > 10){
+                break;
+            }
             uint32_t index = 0;
             enum Direction direction = rand() % 4;
             switch(direction){
@@ -76,6 +81,9 @@ void random_walk(void* cave, int32_t w, int32_t h){
                current_index > w * h - 1){
                 current_index = -1;
             }
+        }
+        if(current_index < 0 || current_index > w * h - 1){
+            current_index = w * (h / 2) + (rand() % w);
         }
         map_cells[current_index] = floor;
         ++floor_count;
