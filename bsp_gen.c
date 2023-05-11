@@ -17,8 +17,8 @@
 
 #define internal static
 
-internal const uint32_t MIN_ROOM_WIDTH = 200;
-internal const uint32_t MIN_ROOM_HEIGHT = 200;
+internal const uint32_t MIN_ROOM_WIDTH = 100;
+internal const uint32_t MIN_ROOM_HEIGHT = 100;
 
 internal const int32_t PADDING = 15;
 internal const int32_t MARGIN = 30;
@@ -38,7 +38,7 @@ BinarySpacePartition(void *Parent,
                      const uint32_t ParentHeight) {
     
     if(Parent == NULL) {
-        return ((struct tag_position){.X=0,.Y=0});
+        return ((struct tag_position){.X=-1,.Y=-1});
     }
 
     if(ParentWidth <= (MIN_ROOM_WIDTH * 2)  ||
@@ -94,33 +94,14 @@ BinarySpacePartition(void *Parent,
             struct tag_position LeftRoomCenterPos = BinarySpacePartition(Begin,
                                  HalfWidth, 
                                  ParentHeight);
-            const int32_t CorridorWidth = HalfWidth - LeftRoomCenterPos.X;
             const int32_t CorridorHeight = 30;
-            const int32_t* CorridorBegin = Begin + LeftRoomCenterPos.X + ((LeftRoomCenterPos.Y - CorridorHeight) * DisplayWidth);
-            const int32_t* CorridorEnd = CorridorBegin + CorridorWidth + CorridorHeight * DisplayWidth;
-            for(uint32_t r = 0; r < CorridorHeight; ++r){
-                uint8_t * Pixel = (uint8_t *) (CorridorBegin + (DisplayWidth * r));
-                for(uint32_t c = 0; c < CorridorWidth;++c){
-                    *Pixel = 200;
-                    ++Pixel;
-                    *Pixel = 200;
-                    ++Pixel;
-                    *Pixel = 200;
-                    ++Pixel;
-                    *Pixel = 0;
-                    ++Pixel;
-                }
-            }
-            //right
-            struct tag_position RightRoomCenterPos = BinarySpacePartition(Begin + HalfWidth,
-                                 HalfWidth, 
-                                 ParentHeight);
-            {
-                const int32_t* RightCorridorBegin = Begin + HalfWidth + ((RightRoomCenterPos.Y - CorridorHeight) * DisplayWidth );
-                const int32_t RightCorridorWidth = RightRoomCenterPos.X;
+            if(LeftRoomCenterPos.Y + LeftRoomCenterPos.X > 0){
+                const int32_t CorridorWidth = HalfWidth - LeftRoomCenterPos.X;
+                const int32_t* CorridorBegin = Begin + LeftRoomCenterPos.X + ((LeftRoomCenterPos.Y - CorridorHeight) * DisplayWidth);
+                const int32_t* CorridorEnd = CorridorBegin + CorridorWidth + CorridorHeight * DisplayWidth;
                 for(uint32_t r = 0; r < CorridorHeight; ++r){
-                    uint8_t * Pixel =(uint8_t*) (RightCorridorBegin + (DisplayWidth * r));
-                    for(uint32_t c = 0; c < RightCorridorWidth;++c){
+                    uint8_t * Pixel = (uint8_t *) (CorridorBegin + (DisplayWidth * r));
+                    for(uint32_t c = 0; c < CorridorWidth;++c){
                         *Pixel = 200;
                         ++Pixel;
                         *Pixel = 200;
@@ -131,25 +112,48 @@ BinarySpacePartition(void *Parent,
                         ++Pixel;
                     }
                 }
-                //vertical corridor
-                const int32_t VerticalCorridorX = HalfWidth;
-                const int32_t VerticalCorridorY = RightRoomCenterPos.Y < LeftRoomCenterPos.Y ? RightRoomCenterPos.Y : LeftRoomCenterPos.Y;
-                int32_t VerticalCorridorHeight = RightRoomCenterPos.Y - LeftRoomCenterPos.Y;
-                if(VerticalCorridorHeight < 0){
-                    VerticalCorridorHeight *= -1;
-                }
-                const int32_t* VerticalCorridorBegin = Begin + VerticalCorridorX - CorridorHeight + (VerticalCorridorY * DisplayWidth);
-                for(uint32_t r = 0; r < VerticalCorridorHeight; ++r){
-                    uint8_t * Pixel =(uint8_t*) (VerticalCorridorBegin + (DisplayWidth * r));
-                    for(uint32_t c = 0; c < CorridorHeight;++c){
-                        *Pixel = 200;
-                        ++Pixel;
-                        *Pixel = 200;
-                        ++Pixel;
-                        *Pixel = 200;
-                        ++Pixel;
-                        *Pixel = 0;
-                        ++Pixel;
+            }
+            //right
+            struct tag_position RightRoomCenterPos = BinarySpacePartition(Begin + HalfWidth,
+                                 HalfWidth, 
+                                 ParentHeight);
+            {
+                if(RightRoomCenterPos.X + RightRoomCenterPos.Y > 0){
+                    const int32_t* RightCorridorBegin = Begin + HalfWidth - (CorridorHeight/2) + ((RightRoomCenterPos.Y - CorridorHeight) * DisplayWidth );
+                    const int32_t RightCorridorWidth = RightRoomCenterPos.X;
+                    for(uint32_t r = 0; r < CorridorHeight; ++r){
+                        uint8_t * Pixel =(uint8_t*) (RightCorridorBegin + (DisplayWidth * r));
+                        for(uint32_t c = 0; c < RightCorridorWidth;++c){
+                            *Pixel = 200;
+                            ++Pixel;
+                            *Pixel = 200;
+                            ++Pixel;
+                            *Pixel = 200;
+                            ++Pixel;
+                            *Pixel = 0;
+                            ++Pixel;
+                        }
+                    }
+                    //vertical corridor
+                    const int32_t VerticalCorridorX = HalfWidth;
+                    const int32_t VerticalCorridorY = RightRoomCenterPos.Y < LeftRoomCenterPos.Y ? RightRoomCenterPos.Y : LeftRoomCenterPos.Y;
+                    int32_t VerticalCorridorHeight = RightRoomCenterPos.Y - LeftRoomCenterPos.Y;
+                    if(VerticalCorridorHeight < 0){
+                        VerticalCorridorHeight *= -1;
+                    }
+                    const int32_t* VerticalCorridorBegin = Begin + VerticalCorridorX - (CorridorHeight/2) + ((VerticalCorridorY - CorridorHeight) * DisplayWidth);
+                    for(uint32_t r = 0; r < VerticalCorridorHeight; ++r){
+                        uint8_t * Pixel =(uint8_t*) (VerticalCorridorBegin + (DisplayWidth * r));
+                        for(uint32_t c = 0; c < CorridorHeight;++c){
+                            *Pixel = 200;
+                            ++Pixel;
+                            *Pixel = 200;
+                            ++Pixel;
+                            *Pixel = 200;
+                            ++Pixel;
+                            *Pixel = 0;
+                            ++Pixel;
+                        }
                     }
                 }
             }
@@ -166,7 +170,7 @@ BinarySpacePartition(void *Parent,
         }
 
     }
-    return ((struct tag_position){0,0});
+    return ((struct tag_position){-1,-1});
 }
 
 void
