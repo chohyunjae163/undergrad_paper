@@ -5,8 +5,6 @@
 #include <windows.h>
 #include <stdbool.h>
 #include <stdint.h>
-//#include "bsp_gen.c"
-//#include "cellular_automata.c"
 
 #define DISPLAY_WIDTH 800
 #define DISPLAY_HEIGHT 600

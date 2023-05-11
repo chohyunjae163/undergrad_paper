@@ -63,6 +63,7 @@ setup_room:
         map[current_index + c] = floor;
       }
     }
+    //make 4-way corridors
     ++current_room;
   }
 }
