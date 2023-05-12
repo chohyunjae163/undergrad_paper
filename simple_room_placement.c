@@ -30,7 +30,7 @@ void simple_room_placement(void* area, int32_t w, int32_t h){
   for(int i = 0; i < w * h; ++i) {
       map[i] = wall;
   }
-  const int32_t max_room_length = 100;
+  const int32_t max_room_length = 200;
   const int32_t min_room_length = 50;
   while (current_room < room_num) {
 setup_room:

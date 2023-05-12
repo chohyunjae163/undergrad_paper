@@ -97,7 +97,8 @@ BinarySpacePartition(void *Parent,
             const int32_t CorridorHeight = 30;
             if(LeftRoomCenterPos.Y + LeftRoomCenterPos.X > 0){
                 const int32_t CorridorWidth = HalfWidth - LeftRoomCenterPos.X;
-                const int32_t* CorridorBegin = Begin + LeftRoomCenterPos.X + ((LeftRoomCenterPos.Y - CorridorHeight) * DisplayWidth);
+                const int32_t* CorridorBegin = Begin + LeftRoomCenterPos.X +
+                    ((LeftRoomCenterPos.Y - CorridorHeight) * DisplayWidth);
                 const int32_t* CorridorEnd = CorridorBegin + CorridorWidth + CorridorHeight * DisplayWidth;
                 for(uint32_t r = 0; r < CorridorHeight; ++r){
                     uint8_t * Pixel = (uint8_t *) (CorridorBegin + (DisplayWidth * r));
@@ -119,7 +120,8 @@ BinarySpacePartition(void *Parent,
                                  ParentHeight);
             {
                 if(RightRoomCenterPos.X + RightRoomCenterPos.Y > 0){
-                    const int32_t* RightCorridorBegin = Begin + HalfWidth - (CorridorHeight/2) + ((RightRoomCenterPos.Y - CorridorHeight) * DisplayWidth );
+                    const int32_t* RightCorridorBegin = Begin + HalfWidth - (CorridorHeight/2) +
+                        ((RightRoomCenterPos.Y - CorridorHeight) * DisplayWidth );
                     const int32_t RightCorridorWidth = RightRoomCenterPos.X;
                     for(uint32_t r = 0; r < CorridorHeight; ++r){
                         uint8_t * Pixel =(uint8_t*) (RightCorridorBegin + (DisplayWidth * r));
@@ -136,12 +138,14 @@ BinarySpacePartition(void *Parent,
                     }
                     //vertical corridor
                     const int32_t VerticalCorridorX = HalfWidth;
-                    const int32_t VerticalCorridorY = RightRoomCenterPos.Y < LeftRoomCenterPos.Y ? RightRoomCenterPos.Y : LeftRoomCenterPos.Y;
+                    const int32_t VerticalCorridorY = RightRoomCenterPos.Y < LeftRoomCenterPos.Y ?
+                        RightRoomCenterPos.Y : LeftRoomCenterPos.Y;
                     int32_t VerticalCorridorHeight = RightRoomCenterPos.Y - LeftRoomCenterPos.Y;
                     if(VerticalCorridorHeight < 0){
                         VerticalCorridorHeight *= -1;
                     }
-                    const int32_t* VerticalCorridorBegin = Begin + VerticalCorridorX - (CorridorHeight/2) + ((VerticalCorridorY - CorridorHeight) * DisplayWidth);
+                    const int32_t* VerticalCorridorBegin = Begin + VerticalCorridorX -
+                        (CorridorHeight/2) + ((VerticalCorridorY - CorridorHeight) * DisplayWidth);
                     for(uint32_t r = 0; r < VerticalCorridorHeight; ++r){
                         uint8_t * Pixel =(uint8_t*) (VerticalCorridorBegin + (DisplayWidth * r));
                         for(uint32_t c = 0; c < CorridorHeight;++c){
